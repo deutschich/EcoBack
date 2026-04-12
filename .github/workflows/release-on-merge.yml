@@ -31,7 +31,7 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          VERSION=$(./gradlew -q properties | grep "^version:" | awk '{print $2}')
+          VERSION=$(./gradlew -Prelease=true -q properties | grep "^version:" | awk '{print $2}')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
