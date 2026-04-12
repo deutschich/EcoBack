@@ -11,19 +11,19 @@ depend: [Vault]
 commands:
   ecoback:
     description: Main command for EcoBack
-    usage: /<command> [reload|backup|backups|rollback]
-    permission: ecoback.command
+    usage: /<command> [backup|backups|rollback|reload]
+    permission: ecoback.admin
 
 permissions:
-  ecoback.command:
-    description: n.a.
+  ecoback.admin:
+    description: Allows use of all EcoBack commands
     default: op
   ecoback.backup:
-    description: n.a.
+    description: Allows creating a backup
     default: op
   ecoback.rollback:
-    description: n.a.
-    default: true
+    description: Allows restoring a backup
+    default: op
   ecoback.update.notify:
-    description: n.a.
+    description: Receives update notifications on join
     default: op
