@@ -1,0 +1,4 @@
+name: EcoBack
+version: '1.0'
+main: com.user404_.ecoBack.EcoBack
+api-version: '1.21'
