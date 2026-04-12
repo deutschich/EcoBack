@@ -9,18 +9,21 @@ website: https://github.com/deutschich/EcoBack
 depend: [Vault]
 
 commands:
-  balsync:
-    description: Main command for BalSync
-    usage: /<command> [reload|save|load|status|backup|backups|rollback]
-    permission: balsync.admin
+  ecoback:
+    description: Main command for EcoBack
+    usage: /<command> [reload|backup|backups|rollback]
+    permission: ecoback.command
 
 permissions:
+  ecoback.command:
+    description: n.a.
+    default: op
   ecoback.backup:
-    description: Allows access to all BalSync commands
+    description: n.a.
     default: op
   ecoback.rollback:
-    description: Allows the player to be synchronized with the database (on join and external changes)
+    description: n.a.
     default: true
   ecoback.update.notify:
-    description: Receive notifications when a new update is available
+    description: n.a.
     default: op
