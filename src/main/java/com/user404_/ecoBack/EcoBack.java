@@ -1,6 +1,6 @@
 package com.user404_.ecoBack;
 
-import com.user404_.EcoBack.BuildConfig;
+import com.user404_.ecoBack.BuildConfig;
 import com.user404_.ecoBack.commands.EcobackCommand;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
