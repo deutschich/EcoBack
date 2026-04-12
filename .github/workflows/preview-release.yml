@@ -5,6 +5,9 @@ on:
     branches:
       - dev   # Trigger on push to dev branch
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest

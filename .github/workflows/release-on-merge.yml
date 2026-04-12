@@ -8,6 +8,9 @@ on:
       - '**.md'       # ignoriert reine Dokumentationsänderungen
       - '.github/**'  # ignoriert Änderungen an Actions selbst
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
