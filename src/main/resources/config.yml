@@ -1,0 +1,10 @@
+# EcoBack Configuration
+
+# Automatic backup interval (0 = disabled)
+backup-interval: 30
+
+# Time unit for the interval: "minutes" or "hours"
+interval-unit: "minutes"
+
+# Language file to use (stored in plugins/EcoBack/lang/lang_<language>.yml)
+language: "en"

@@ -37,8 +37,6 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
-    implementation("mysql:mysql-connector-java:8.0.33")
-    implementation("com.zaxxer:HikariCP:5.0.1")
 }
 
 tasks.withType<JavaCompile> {
@@ -60,13 +58,13 @@ sourceSets.main.get().java.srcDir(generatedSrcDir)
 
 // Task that writes BuildConfig.java
 val generateBuildConfig = tasks.register("generateBuildConfig") {
-    val buildConfigFile = File(generatedSrcDir, "com/user404_/EcoBack/BuildConfig.java")
+    val buildConfigFile = File(generatedSrcDir, "com/user404_/ecoBack/BuildConfig.java")
     outputs.file(buildConfigFile)
     doLast {
         buildConfigFile.parentFile.mkdirs()
         buildConfigFile.writeText(
             """
-            package com.user404_.EcoBack;
+            package com.user404_.ecoBack;
             public final class BuildConfig {
                 public static final String VERSION = "${project.version}";
                 public static final String COMMIT_ID = "${commitId}";
