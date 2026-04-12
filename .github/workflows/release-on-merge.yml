@@ -1,6 +1,7 @@
 name: Release on Merge to Master
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master  # oder "main", je nach Repo
