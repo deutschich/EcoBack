@@ -15,10 +15,11 @@ public class UpdateChecker {
 
     private final EcoBack plugin;
     private static final String VERSION_URL = "https://raw.githubusercontent.com/deutschich/EcoBack/master/version.json";
-    private static final String PROJECT_URL = "https://github.com/deutschich/EcoBack/releases";
+    private static final String PROJECT_URL = "https://github.com/deutschich/EcoBack/releases/latest";
 
     private boolean updateAvailable = false;
     private String latestVersion;
+    private String downloadURL;
 
     public UpdateChecker(EcoBack plugin) {
         this.plugin = plugin;
@@ -40,6 +41,7 @@ public class UpdateChecker {
                         try (InputStreamReader reader = new InputStreamReader(connection.getInputStream())) {
                             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
                             latestVersion = json.get("version").getAsString();
+                            downloadURL = json.get("download").getAsString();
                             String current = plugin.getDescription().getVersion();
 
                             if (!current.equalsIgnoreCase(latestVersion)) {
@@ -69,10 +71,10 @@ public class UpdateChecker {
         String prefix = plugin.getLanguageManager().getMessage("prefix");
         String current = plugin.getDescription().getVersion();
         player.sendMessage(prefix + " §eNew update available! §av" + latestVersion + " §e(current: §av" + current + "§e)");
-        player.sendMessage(prefix + " §eDownload: §9§n" + PROJECT_URL);
+        player.sendMessage(prefix + " §eDownload:");
         // Clickable link for Spigot/Paper
-        net.md_5.bungee.api.chat.TextComponent link = new net.md_5.bungee.api.chat.TextComponent("§9§n" + PROJECT_URL);
-        link.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.OPEN_URL, PROJECT_URL));
+        net.md_5.bungee.api.chat.TextComponent link = new net.md_5.bungee.api.chat.TextComponent(prefix + " §b§nDownload now!");
+        link.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.OPEN_URL, downloadURL));
         player.spigot().sendMessage(link);
     }
 }
