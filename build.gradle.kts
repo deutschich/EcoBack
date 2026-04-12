@@ -1,55 +1,87 @@
+import org.gradle.jvm.tasks.Jar
+
 plugins {
-    id 'java'
-    id("xyz.jpenilla.run-paper") version "2.3.1"
+    java
 }
 
-group = 'com.user404_'
-version = '1.0'
+group = "com.user404_"
+val baseVersion = "1.0"
+
+// Determine if this is a release build (property -Prelease=true)
+val isRelease = project.hasProperty("release") && project.property("release") == "true"
+
+// Get the current Git commit hash (short)
+val commitId = providers.exec {
+    commandLine("git", "rev-parse", "--short", "HEAD")
+}.standardOutput.asText.get().trim().takeIf { it.isNotBlank() } ?: "unknown"
+
+// Set the final version
+version = if (isRelease) {
+    baseVersion
+} else {
+    "$baseVersion-preview+$commitId"
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
 
 repositories {
     mavenCentral()
-    maven {
-        name = "papermc-repo"
-        url = "https://repo.papermc.io/repository/maven-public/"
-    }
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://jitpack.io")
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
+    implementation("mysql:mysql-connector-java:8.0.33")
+    implementation("com.zaxxer:HikariCP:5.0.1")
 }
 
-tasks {
-    runServer {
-        // Configure the Minecraft version for our task.
-        // This is the only required configuration besides applying the plugin.
-        // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.21")
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+
+// Process plugin.yml to inject the version
+tasks.processResources {
+    filesMatching("plugin.yml") {
+        expand("version" to project.version)
     }
 }
 
-def targetJavaVersion = 21
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+// ===== GENERATED SOURCES CONFIGURATION =====
+val generatedSrcDir = layout.buildDirectory.dir("generated/sources/buildConfig/java/main").get().asFile
+
+// Add the generated sources directory to the main source set
+sourceSets.main.get().java.srcDir(generatedSrcDir)
+
+// Task that writes BuildConfig.java
+val generateBuildConfig = tasks.register("generateBuildConfig") {
+    val buildConfigFile = File(generatedSrcDir, "com/user404_/EcoBack/BuildConfig.java")
+    outputs.file(buildConfigFile)
+    doLast {
+        buildConfigFile.parentFile.mkdirs()
+        buildConfigFile.writeText(
+            """
+            package com.user404_.EcoBack;
+            public final class BuildConfig {
+                public static final String VERSION = "${project.version}";
+                public static final String COMMIT_ID = "${commitId}";
+                public static final String BUILD_TYPE = "${if (isRelease) "release" else "preview"}";
+                public static final boolean UPDATE_CHECKER_ENABLED = ${isRelease};
+            }
+            """.trimIndent()
+        )
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+// Make compileJava depend on the generation task
+tasks.compileJava.get().dependsOn(generateBuildConfig)
+// =============================================
 
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
-        options.release.set(targetJavaVersion)
-    }
-}
-
-processResources {
-    def props = [version: version]
-    inputs.properties props
-    filteringCharset 'UTF-8'
-    filesMatching('plugin.yml') {
-        expand props
-    }
+tasks.jar {
+    archiveBaseName.set("EcoBack")
 }

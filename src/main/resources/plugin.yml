@@ -1,4 +1,26 @@
 name: EcoBack
-version: '1.0'
+version: ${version}
 main: com.user404_.ecoBack.EcoBack
 api-version: '1.21'
+description: Backup Player Balances easily
+author: user404_
+website: https://github.com/deutschich/EcoBack
+
+depend: [Vault]
+
+commands:
+  balsync:
+    description: Main command for BalSync
+    usage: /<command> [reload|save|load|status|backup|backups|rollback]
+    permission: balsync.admin
+
+permissions:
+  ecoback.backup:
+    description: Allows access to all BalSync commands
+    default: op
+  ecoback.rollback:
+    description: Allows the player to be synchronized with the database (on join and external changes)
+    default: true
+  ecoback.update.notify:
+    description: Receive notifications when a new update is available
+    default: op
