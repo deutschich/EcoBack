@@ -6,5 +6,12 @@ backup-interval: 30
 # Time unit for the interval: "minutes" or "hours"
 interval-unit: "minutes"
 
+# --- Update checker settings ---
+# Interval for checking new versions (0 = disabled)
+update-check-interval: 30
+
+# Time unit: "minutes" or "hours"
+update-check-unit: "minutes"
+
 # Language file to use (stored in plugins/EcoBack/lang/lang_<language>.yml)
 language: "en"

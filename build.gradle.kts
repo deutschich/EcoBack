@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.user404_"
-val baseVersion = "1.0"
+val baseVersion = "1.0.1"
 
 // Determine if this is a release build (property -Prelease=true)
 val isRelease = project.hasProperty("release") && project.property("release") == "true"

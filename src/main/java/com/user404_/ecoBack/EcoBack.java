@@ -19,14 +19,13 @@ public final class EcoBack extends JavaPlugin {
     private LanguageManager languageManager;
     private UpdateChecker updateChecker;
     private BukkitTask backupTask;
+    private BukkitTask updateCheckTask;  // Task for periodic update checks
     private Logger logger;
 
     @Override
     public void onEnable() {
         instance = this;
         logger = getLogger();
-
-
 
         // Save default config and language files
         saveDefaultConfig();
@@ -55,8 +54,8 @@ public final class EcoBack extends JavaPlugin {
         // Schedule automatic backups
         startBackupScheduler();
 
-        // Check for updates
-        updateChecker.checkForUpdates();
+        // Schedule periodic update checks
+        startUpdateScheduler();
 
         // Notify ops on join
         Bukkit.getPluginManager().registerEvents(new org.bukkit.event.Listener() {
@@ -84,6 +83,9 @@ public final class EcoBack extends JavaPlugin {
     public void onDisable() {
         if (backupTask != null) {
             backupTask.cancel();
+        }
+        if (updateCheckTask != null) {
+            updateCheckTask.cancel();
         }
         getLogger().info("EcoBack disabled.");
     }
@@ -120,13 +122,58 @@ public final class EcoBack extends JavaPlugin {
         }.runTaskTimerAsynchronously(this, ticks, ticks);
     }
 
+    /**
+     * Starts the periodic update checker based on config settings.
+     * Only runs if update checking is enabled in the build (release builds).
+     */
+    private void startUpdateScheduler() {
+        // Only run if update checker is enabled in this build (release builds)
+        if (!BuildConfig.UPDATE_CHECKER_ENABLED) {
+            getLogger().info("Update checking is disabled in this build.");
+            return;
+        }
+
+        int interval = getConfig().getInt("update-check-interval", 30);
+        if (interval <= 0) {
+            getLogger().info("Periodic update checking is disabled (interval <= 0).");
+            return;
+        }
+
+        String unit = getConfig().getString("update-check-unit", "minutes").toLowerCase();
+        long ticks;
+        if (unit.equals("minutes")) {
+            ticks = interval * 60 * 20L;
+        } else { // hours (default)
+            ticks = interval * 60 * 60 * 20L;
+        }
+
+        // Check once immediately
+        updateChecker.checkForUpdates();
+
+        // Then schedule periodic checks
+        updateCheckTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                updateChecker.checkForUpdates();
+            }
+        }.runTaskTimerAsynchronously(this, ticks, ticks);
+    }
+
     public void reloadPlugin() {
         reloadConfig();
         languageManager.reload();
+
+        // Restart backup scheduler
         if (backupTask != null) {
             backupTask.cancel();
         }
         startBackupScheduler();
+
+        // Restart update checker scheduler
+        if (updateCheckTask != null) {
+            updateCheckTask.cancel();
+        }
+        startUpdateScheduler();
     }
 
     // Getters
