@@ -8,6 +8,7 @@ on:
     paths-ignore:
       - '**.md'       # ignoriert reine Dokumentationsänderungen
       - '.github/**'  # ignoriert Änderungen an Actions selbst
+      - 'version.json'
 
 permissions:
   contents: write
